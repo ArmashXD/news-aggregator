@@ -13,16 +13,19 @@ export default defineConfig({
     },
   },
   preview: {
+    host: "0.0.0.0",
     port: 3000,
-    strictPort: true,
   },
   server: {
-    port: 3000,
+    host: "0.0.0.0",
+    port: 5173,
     strictPort: true,
-    host: true,
-    origin: "http://0.0.0.0:3000",
+    cors: {
+      origin: "http://localhost",
+      credentials: true,
+    },
   },
   define: {
-    "process.env": process.env,
+    "process.env": JSON.stringify(process.env), // Ensures environment variables are available
   },
 });

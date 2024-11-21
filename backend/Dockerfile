@@ -1,27 +1,28 @@
 FROM php:8.1-fpm
 
-WORKDIR /app
+WORKDIR /var/www
 
 RUN apt-get update && apt-get install -y \
     git \
     curl \
-    zip \
-    unzip \
-    libpq-dev \
+    libpng-dev \
     libonig-dev \
     libxml2-dev \
-    libzip-dev \
-    && docker-php-ext-install pdo_mysql mbstring zip
+    zip \
+    unzip \
+    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs
+
 COPY . .
 
-RUN chown -R www-data:www-data /app \
-    && chmod -R 775 /app/storage /app/bootstrap/cache
+RUN composer install --optimize-autoloader
 
-RUN composer install --optimize-autoloader 
+RUN chown -R www-data:www-data /var/www && \
+    chmod -R 755 /var/www/storage && \
+    chmod -R 755 /var/www/bootstrap/cache
 
 EXPOSE 8000
-
-CMD ["php-fpm"]
